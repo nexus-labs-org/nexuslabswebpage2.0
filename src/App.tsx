@@ -1,13 +1,6 @@
-import { useState, type FormEvent } from 'react'
-
-const capabilities = [
-  ['01', 'Estratégia & Inovação', 'Mapeamos oportunidades e desenhamos caminhos para negócios relevantes.'],
-  ['02', 'Produtos Digitais', 'Criamos produtos intuitivos, escaláveis e desejáveis.'],
-  ['03', 'IA & Dados', 'Transformamos dados em inteligência para decisões mais ágeis.'],
-  ['04', 'Experiências de Marca', 'Aproximamos marcas, pessoas e possibilidades.'],
-]
-
-const tickerItems = ['PRODUTOS DIGITAIS', 'INTELIGÊNCIA ARTIFICIAL', 'EXPERIÊNCIAS DE MARCA', 'ESTRATÉGIA & INOVAÇÃO']
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
+import ProjectGrid from './ProjectGrid'
+import { projects, type Project } from './projects'
 
 const email = 'ola@nexuslab.com.br'
 // Número com DDI + DDD, só dígitos (ex.: 5511999999999). Vazio esconde o botão do WhatsApp.
@@ -19,14 +12,33 @@ const socials = [
   ['Instagram', ''],
 ].filter(([, href]) => href)
 
-const Brand = () => (
-  <a className="brand" href="#inicio" aria-label="Nexus Labs">
-    <img src="/assets/nexus-labs-horizontal-light.svg" alt="Nexus Labs" className="brand-logo" width="135" height="36" />
-  </a>
-)
-const Eyebrow = ({ children }: { children: string }) => <p className="eyebrow"><b />{children}</p>
+// Colours the header cycles through on hover: green, red, violet, cyan.
+const hoverColors = ['#3FBF6B', '#FF3831', '#7A5CFF', '#00E5FF']
 
-const ContactForm = ({ interest, onInterestChange }: { interest: string, onInterestChange: (value: string) => void }) => {
+const interests = ['Aplicativo mobile', 'Plataforma web', 'Sistema sob medida', 'Ainda não sei']
+const tickerItems = ['Arraste para explorar o trabalho', 'Apps, plataformas e sistemas sob medida', 'Para startups e empresas', 'Clique em um projeto para abrir']
+
+type Panel = { type: 'about' } | { type: 'list' } | { type: 'contact' } | { type: 'project'; project: Project } | null
+
+const Mark = () => <span className="mark" aria-hidden="true" />
+
+function Drawer({ side, title, onClose, children }: { side: 'left' | 'right'; title: string; onClose: () => void; children: ReactNode }) {
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => { heading.current?.focus() }, [title])
+  return <aside className={`drawer drawer-${side}`} aria-labelledby="drawer-title">
+    <div className="drawer-bar">
+      <button className="drawer-close" onClick={onClose}>Fechar<span aria-hidden="true" className="close-icon" /></button>
+    </div>
+    <div className="drawer-body">
+      <h2 id="drawer-title" ref={heading} tabIndex={-1}>{title}</h2>
+      {children}
+    </div>
+  </aside>
+}
+
+function ContactForm({ interest }: { interest: string }) {
+  const [choice, setChoice] = useState(interest)
+  useEffect(() => setChoice(interest), [interest])
   const send = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
@@ -45,30 +57,124 @@ const ContactForm = ({ interest, onInterestChange }: { interest: string, onInter
   return <form className="contact-form" onSubmit={send}>
     <label>Nome<input name="nome" autoComplete="name" required /></label>
     <label><span>Empresa <small>(opcional)</small></span><input name="empresa" autoComplete="organization" /></label>
-    <label>Interesse<select name="interesse" value={interest} onChange={event => onInterestChange(event.target.value)}>
-      {capabilities.map(([, title]) => <option key={title}>{title}</option>)}
-      <option>Outro assunto</option>
+    <label>O que você quer construir<select name="interesse" value={choice} onChange={event => setChoice(event.target.value)}>
+      {interests.map(item => <option key={item}>{item}</option>)}
     </select></label>
-    <label>Conte sobre o projeto<textarea name="mensagem" rows={4} required /></label>
+    <label>Conte sobre o projeto<textarea name="mensagem" rows={5} required /></label>
     <div className="form-actions">
-      {whatsapp && <button className="button fill" type="submit" value="whatsapp">Enviar pelo WhatsApp <b>→</b></button>}
-      <button className={`button ${whatsapp ? 'outline' : 'fill'}`} type="submit" value="email">Enviar por e-mail</button>
+      {whatsapp && <button className="action" type="submit" value="whatsapp">Enviar pelo WhatsApp</button>}
+      <button className={whatsapp ? 'action action-quiet' : 'action'} type="submit" value="email">Enviar por e-mail</button>
     </div>
+    <p className="form-note">Abre o seu app de e-mail com a mensagem pronta para {email}.</p>
   </form>
 }
 
 export default function App() {
-  const [interest, setInterest] = useState(capabilities[0][1])
+  const [panel, setPanel] = useState<Panel>(null)
+  const [ready, setReady] = useState(false)
+  const opener = useRef<HTMLElement | null>(null)
 
-  return <><div className="noise" />
-    <header className="nav wrap"><Brand /><nav><a href="#sobre">O laboratório</a><a href="#capacidades">Capacidades</a><a href="#contato">Contato</a></nav><a className="nav-link" href="#contato">Vamos conversar</a></header>
-    <main id="inicio">
-      <section className="hero wrap"><div className="hero-text"><Eyebrow>TECNOLOGIA, ESTRATÉGIA & IMPACTO</Eyebrow><h1>Ideias que<br /><em>ganham vida</em><br />em tecnologia.</h1><p>Somos um laboratório de inovação digital. Transformamos desafios complexos em produtos, experiências e sistemas que movem negócios.</p><div className="actions"><a className="button fill" href="#contato">Comece um projeto <b>→</b></a><a className="button underline" href="#sobre">Conheça a NEXUS</a></div></div><div className="orbital" aria-hidden="true"><i className="ring outer"/><i className="ring inner"/><div className="core"><img src="/assets/nexus-labs-symbol.svg" alt="Nexus Labs Keystone Mark" className="core-logo" /></div><div className="orbit orbit-inner orbit-a"><i className="dot" /></div><div className="orbit orbit-inner orbit-b"><i className="dot" /></div><div className="orbit orbit-c"><i className="dot" /></div></div><div className="scroll">SCROLL PARA EXPLORAR <i /> 2026 — ∞</div></section>
-      <div className="ticker"><div className="ticker-track">{[0, 1].map(copy => <div key={copy} className="ticker-group" aria-hidden={copy === 1 || undefined}>{[0, 1, 2].flatMap(repeat => tickerItems.map(item => <span key={`${repeat}-${item}`}>{item} <b>✦</b></span>))}</div>)}</div></div>
-      <section id="sobre" className="about wrap"><div className="about-grid"><h2>Construímos o<br />próximo agora.</h2><div><p>A NEXUS LABS aproxima o pensamento estratégico da potência da tecnologia. Trabalhamos ao lado de equipes ambiciosas para criar valor que permanece.</p><a className="inline-link" href="#contato">Nossa visão</a></div></div><div className="metrics"><p><strong>+30</strong>projetos lançados</p><p><strong>06</strong>especialidades integradas</p><p><strong>∞</strong>possibilidades para explorar</p></div></section>
-      <section id="capacidades" className="capabilities"><div className="wrap"><div className="section-head"><h2>O que fazemos</h2><p>Do primeiro insight ao impacto real.</p></div><div className="capability-list">{capabilities.map(([index, title, text]) => <article key={index}><span>{index}</span><h3>{title}</h3><p>{text}</p><a className="capability-cta" href="#contato" onClick={() => setInterest(title)} aria-label={`Falar sobre ${title}`}>↗</a></article>)}</div></div></section>
-      <section className="quote wrap"><div className="quote-mark"><img src="/assets/nexus-labs-symbol.svg" alt="Nexus Labs Keystone Mark" /></div><blockquote>“A melhor tecnologia não é a que impressiona. É a que torna o impossível natural.”</blockquote></section>
-      <section id="contato" className="contact"><div className="glow"/><div className="wrap contact-grid"><div><h2>Tem uma ideia<br />que não sai da<br />cabeça?</h2><a className="contact-email" href={`mailto:${email}`}>{email}</a></div><ContactForm interest={interest} onInterestChange={setInterest} /></div></section>
-    </main><footer className="wrap"><Brand /><p>© 2026 NEXUS LABS. FEITO PARA O FUTURO.</p>{socials.length > 0 && <div>{socials.map(([label, href]) => <a key={label} href={href} target="_blank" rel="noopener noreferrer">{label}</a>)}</div>}</footer>
-  </>
+  const open = useCallback((next: Panel) => {
+    opener.current = document.activeElement as HTMLElement
+    setPanel(next)
+  }, [])
+  const close = useCallback(() => {
+    setPanel(null)
+    opener.current?.focus?.()
+  }, [])
+  const openProject = useCallback((project: Project) => open({ type: 'project', project }), [open])
+  const onReady = useCallback(() => setReady(true), [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [close])
+
+  // Header hover: the zone decides which rules and tagline light up; each new hover takes the next colour.
+  const [zone, setZone] = useState('')
+  const [colorIndex, setColorIndex] = useState(0)
+  const lightUp = (next: string) => {
+    if (next === zone) return
+    setColorIndex(i => (i + 1) % hoverColors.length)
+    setZone(next)
+  }
+
+  const interest = panel?.type === 'project' ? panel.project.kind : interests[0]
+  const [contactInterest, setContactInterest] = useState(interests[0])
+  const startProject = (from?: string) => {
+    setContactInterest(from && interests.includes(from) ? from : interests[0])
+    open({ type: 'contact' })
+  }
+
+  return <div className="app" data-ready={ready}>
+    <a className="skip" href="#conteudo">Pular para o conteúdo</a>
+    <header className="masthead" data-zone={zone} style={{ '--hl': hoverColors[colorIndex] } as CSSProperties} onPointerLeave={() => setZone('')}>
+      <nav className="cell-group cell-group-left" aria-label="Seções" onPointerEnter={() => lightUp('left')}>
+        <button className="cell cell-link" aria-pressed={panel?.type === 'about'} onClick={() => panel?.type === 'about' ? close() : open({ type: 'about' })}>Sobre</button>
+        <button className="cell cell-link" aria-pressed={panel?.type === 'list'} onClick={() => panel?.type === 'list' ? close() : open({ type: 'list' })}>Projetos</button>
+      </nav>
+      <div className="cell cell-mark" onPointerEnter={() => lightUp('left')}><Mark /></div>
+      <div className="cell cell-blank cell-blank-l1" aria-hidden="true" />
+      <p className="cell cell-tagline cell-tagline-left"><span>Apps, plataformas e sistemas</span></p>
+      <div className="cell cell-blank cell-blank-l3" aria-hidden="true" />
+      <h1 className="cell cell-logo" onPointerEnter={() => lightUp('logo')}>
+        <span className="logo-mask" aria-hidden="true" />
+        <span className="sr-only">NEXUS LABS — estúdio de produtos digitais</span>
+      </h1>
+      <div className="cell cell-blank cell-blank-r1" aria-hidden="true" />
+      <p className="cell cell-tagline cell-tagline-right"><span>Do insight ao produto no ar</span></p>
+      <div className="cell cell-blank cell-blank-r3" aria-hidden="true" />
+      <nav className="cell-group cell-group-right" aria-label="Contato" onPointerEnter={() => lightUp('right')}>
+        {socials.map(([label, href]) => <a key={label} className="cell cell-link" href={href} target="_blank" rel="noopener noreferrer">{label}</a>)}
+        <a className="cell cell-link" href={`mailto:${email}`}>E-mail</a>
+      </nav>
+      <div className="cell cell-cta-wrap" onPointerEnter={() => lightUp('right')}>
+        <button className="cell-cta" onClick={() => startProject()}><span>Começar um projeto</span></button>
+      </div>
+    </header>
+
+    <main id="conteudo" className="stage">
+      <ProjectGrid onOpen={openProject} onReady={onReady} />
+      <div className="ticker" aria-label="Avisos">
+        <div className="ticker-track">{[0, 1].map(copy => <p key={copy} aria-hidden={copy === 1 || undefined}>{tickerItems.map(item => <span key={item}>{item}</span>)}</p>)}</div>
+      </div>
+    </main>
+
+    {panel?.type === 'about' && <Drawer side="left" title="Somos a NEXUS LABS" onClose={close}>
+      <p className="lead">Somos um estúdio de produtos digitais. Desenhamos e construímos aplicativos, plataformas web e sistemas sob medida, para startups e para empresas que estão criando algo novo.</p>
+      <p>Esta página mostra o trabalho como ele acontece no estúdio: muitas frentes ao mesmo tempo. Arraste a grade para explorar e clique em um projeto para abrir.</p>
+      <h3>O que construímos</h3>
+      <ul className="service-list">
+        <li>Aplicativos mobile</li>
+        <li>Plataformas web</li>
+        <li>Sistemas sob medida</li>
+      </ul>
+      <h3>Fale com a gente</h3>
+      <p><a className="text-link" href={`mailto:${email}`}>{email}</a></p>
+      <button className="action" onClick={() => startProject()}>Começar um projeto</button>
+    </Drawer>}
+
+    {panel?.type === 'list' && <Drawer side="left" title="Projetos" onClose={close}>
+      <ul className="project-list">{projects.map(p => <li key={p.slug}>
+        <button onClick={() => setPanel({ type: 'project', project: p })}>
+          <img src={p.images[0]} alt="" width="96" height="64" loading="lazy" />
+          <span><strong>{p.name}</strong><small>{p.kind}{p.illustrative && ' · exemplo ilustrativo'}</small></span>
+        </button>
+      </li>)}</ul>
+    </Drawer>}
+
+    {panel?.type === 'project' && <Drawer side="right" title={panel.project.name} onClose={close}>
+      <p className="project-kind">{panel.project.kind}{panel.project.illustrative && ' · exemplo ilustrativo'}</p>
+      <p className="lead">{panel.project.summary}</p>
+      <div className="project-gallery">{panel.project.images.map((src, i) => <img key={src} src={src} alt={`${panel.project.name}, tela ${i + 1}`} loading="lazy" width="600" height="400" />)}</div>
+      {panel.project.illustrative && <p className="form-note">Projeto e imagens ilustrativos, para mostrar o tipo de trabalho do estúdio.</p>}
+      <button className="action" onClick={() => startProject(interest)}>Quero algo assim</button>
+    </Drawer>}
+
+    {panel?.type === 'contact' && <Drawer side="right" title="Começar um projeto" onClose={close}>
+      <p className="lead">Conte o que você quer construir. A gente responde por e-mail.</p>
+      <ContactForm interest={contactInterest} />
+    </Drawer>}
+  </div>
 }

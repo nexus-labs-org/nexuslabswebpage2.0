@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T12:00:00Z",
+  "title": "Design System: NEXUS LABS",
+  "extensions": {
+    "colorMeta": {
+      "red": { "role": "primary", "displayName": "Signal Red", "canonical": "#FF3831", "tonalRamp": ["#3A0806", "#66100C", "#991812", "#CC2019", "#FF3831", "#FF6A63", "#FFA09B", "#FFD9D7"] },
+      "red-lift": { "role": "primary", "displayName": "Red Lift (hover)", "canonical": "#FF5A4F", "tonalRamp": ["#3A0C09", "#661711", "#99231A", "#CC2F23", "#FF3831", "#FF5A4F", "#FF948C", "#FFD6D2"] },
+      "hover-green": { "role": "secondary", "displayName": "Hover Green (header cycle)", "canonical": "#3FBF6B", "tonalRamp": ["#0B2414", "#144024", "#1E5F36", "#2A8049", "#3FBF6B", "#6FD08F", "#A3E1B7", "#DAF3E2"] },
+      "hover-violet": { "role": "secondary", "displayName": "Hover Violet (header cycle)", "canonical": "#7A5CFF", "tonalRamp": ["#160E3D", "#251866", "#382499", "#5038CC", "#7A5CFF", "#9B85FF", "#BEAFFF", "#E5DEFF"] },
+      "hover-cyan": { "role": "secondary", "displayName": "Hover Cyan (header cycle)", "canonical": "#00E5FF", "tonalRamp": ["#00303A", "#00525F", "#007989", "#00A3B6", "#00CCE3", "#00E5FF", "#6FF0FF", "#CCFAFF"] },
+      "ground": { "role": "neutral", "displayName": "Warm Night", "canonical": "#181616", "tonalRamp": ["#0B0A0A", "#110F0F", "#181616", "#221F1E", "#3A3634", "#5E5A56", "#8F8A84", "#D6D1CA"] },
+      "ground-deep": { "role": "neutral", "displayName": "Deep Night", "canonical": "#110F0F", "tonalRamp": ["#060505", "#0B0A0A", "#110F0F", "#1B1818", "#2E2A29", "#524D4B", "#857F7B", "#D2CCC6"] },
+      "panel": { "role": "neutral", "displayName": "Ember Panel", "canonical": "#221F1E", "tonalRamp": ["#0E0D0C", "#181616", "#221F1E", "#2F2B2A", "#47423F", "#6B6560", "#9A948D", "#DCD6CF"] },
+      "cream": { "role": "neutral", "displayName": "Cream", "canonical": "#FFFDDB", "tonalRamp": ["#2E2D22", "#4D4B38", "#6E6B52", "#918E6F", "#B8B49C", "#D9D6BA", "#F0EECD", "#FFFDDB"] },
+      "muted": { "role": "neutral", "displayName": "Muted Parchment", "canonical": "#B8B49C", "tonalRamp": ["#22211B", "#3A3830", "#555248", "#737063", "#958F7E", "#B8B49C", "#D3D0BC", "#EEECDF"] },
+      "rule": { "role": "neutral", "displayName": "Rule", "canonical": "rgba(255, 253, 219, 0.14)", "tonalRamp": ["rgba(255,253,219,0.04)", "rgba(255,253,219,0.08)", "rgba(255,253,219,0.11)", "rgba(255,253,219,0.14)", "rgba(255,253,219,0.20)", "rgba(255,253,219,0.30)", "rgba(255,253,219,0.45)", "rgba(255,253,219,0.65)"] },
+      "rule-strong": { "role": "neutral", "displayName": "Rule Strong", "canonical": "rgba(255, 253, 219, 0.3)", "tonalRamp": ["rgba(255,253,219,0.10)", "rgba(255,253,219,0.14)", "rgba(255,253,219,0.20)", "rgba(255,253,219,0.25)", "rgba(255,253,219,0.30)", "rgba(255,253,219,0.40)", "rgba(255,253,219,0.55)", "rgba(255,253,219,0.75)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Drawer titles only." },
+      "headline": { "displayName": "Headline", "purpose": "The two header taglines; hidden below 1100px." },
+      "cta": { "displayName": "CTA", "purpose": "The header 'Começar um projeto' block only." },
+      "body-lead": { "displayName": "Body Lead", "purpose": "First paragraph of a drawer, in Cream." },
+      "body": { "displayName": "Body", "purpose": "Drawer prose and service lists in Muted Parchment, max 62ch." },
+      "label": { "displayName": "Label", "purpose": "Form labels; close button and project kind in the same family at 12px and 14px." },
+      "nav": { "displayName": "Nav", "purpose": "Uppercase header nav and contact cells." },
+      "section-label": { "displayName": "Section Label", "purpose": "Uppercase red drawer sub-heads over their content." },
+      "readout": { "displayName": "Readout", "purpose": "X/Y coordinate readouts with tabular figures." },
+      "ticker": { "displayName": "Ticker", "purpose": "Uppercase scrolling ticker only." }
+    },
+    "shadows": [
+      { "name": "quiet-ring", "value": "inset 0 0 0 1px rgba(255, 253, 219, 0.3)", "purpose": "Border of the quiet button." },
+      { "name": "focus-default", "value": "outline: 2px solid #FF3831; outline-offset: -2px", "purpose": "Global focus-visible ring." },
+      { "name": "focus-on-red", "value": "outline: 2px solid #FFFDDB; outline-offset: 3px", "purpose": "Focus ring on red blocks (header CTA, action buttons)." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Control press and thumbnail scale, about 160-200ms." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Header colour sweeps (700ms) and the CTA wipe (520ms)." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Drawer slide-in, 420ms." },
+      { "name": "state-fast", "value": "160ms ease", "purpose": "Background and border colour changes on buttons and inputs; nav label colour at 200ms." },
+      { "name": "hover-cycle", "value": "#3FBF6B, #FF3831, #7A5CFF, #00E5FF; next colour per new header zone", "purpose": "Header hover colour sequence." },
+      { "name": "lens-entrance", "value": "1400ms, ease-out quartic, zoom 1.55x to rest; tiles fade in over 700ms", "purpose": "The grid entrance. Skipped under reduced motion." },
+      { "name": "grid-drift", "value": "0.45px per frame; momentum eases into it at 0.05 per frame; direction follows the last drag", "purpose": "Continuous territory drift. Off under reduced motion." },
+      { "name": "canvas-reveal", "value": "opacity 500ms ease", "purpose": "Grid canvas fades in once ready." },
+      { "name": "ticker-loop", "value": "30s linear infinite", "purpose": "Ticker scroll; pauses on hover, stops under reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "phone-narrow", "value": "380px" },
+      { "name": "phone", "value": "760px" },
+      { "name": "tablet", "value": "1100px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Square red block for the one next step in a drawer.",
+      "html": "<button class=\"ds-action\">Começar um projeto</button>",
+      "css": ".ds-action { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 0; background: #FF3831; color: #181616; font: 800 14px 'Manrope Variable', system-ui, sans-serif; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease; } .ds-action:hover { background: #FF5A4F; } .ds-action:active { transform: scale(0.97); } .ds-action:focus-visible { outline: 2px solid #FFFDDB; outline-offset: 3px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Secondary submit option, shown only beside a primary.",
+      "html": "<button class=\"ds-action-quiet\">Enviar por e-mail</button>",
+      "css": ".ds-action-quiet { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 0; background: transparent; color: #FFFDDB; box-shadow: inset 0 0 0 1px rgba(255, 253, 219, 0.3); font: 800 14px 'Manrope Variable', system-ui, sans-serif; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease; } .ds-action-quiet:hover { background: #221F1E; } .ds-action-quiet:active { transform: scale(0.97); } .ds-action-quiet:focus-visible { outline: 2px solid #FF3831; outline-offset: -2px; }"
+    },
+    {
+      "name": "Header CTA",
+      "kind": "button",
+      "refersTo": "header-cta",
+      "description": "Red serif block in the header; hover wipes the red away to cream with red type.",
+      "html": "<div class=\"ds-cta-wrap\"><button class=\"ds-cta\"><span>Começar um projeto</span></button></div>",
+      "css": ".ds-cta-wrap { width: 220px; height: 112px; padding: 8px; background: #181616; } .ds-cta { position: relative; width: 100%; height: 100%; overflow: hidden; border: 0; border-radius: 6px; background: #FFFDDB; color: #FF3831; font: 400 22px/1 'Instrument Serif', Georgia, serif; white-space: nowrap; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); } .ds-cta::before { content: ''; position: absolute; inset: 0; background: #FF3831; clip-path: inset(0 0 0 0); transition: clip-path 520ms cubic-bezier(0.77, 0, 0.175, 1); } .ds-cta span { position: relative; display: block; padding: 0 10px; color: #FFFDDB; transition: color 300ms ease; } .ds-cta:hover::before { clip-path: inset(0 0 0 100%); } .ds-cta:hover span { color: #FF3831; } .ds-cta:active { transform: scale(0.97); } .ds-cta:focus-visible { outline: 2px solid #FFFDDB; outline-offset: 3px; }"
+    },
+    {
+      "name": "Masthead",
+      "kind": "nav",
+      "refersTo": "header-cell-link",
+      "description": "Boxed header on 1px cream rules: uppercase mono nav, a tagline between rules, and the cream logo mask; hover sweeps colour through the tagline and draws its rules in.",
+      "html": "<header class=\"ds-masthead\" style=\"--hl: #7A5CFF\"><nav class=\"ds-group\"><button class=\"ds-cell ds-link\" aria-pressed=\"true\">Sobre</button><button class=\"ds-cell ds-link\">Projetos</button></nav><div class=\"ds-cell\"></div><div class=\"ds-cell\"></div><p class=\"ds-cell ds-tagline\"><span>Do insight ao produto no ar</span></p><div class=\"ds-cell\"></div><div class=\"ds-cell\"></div></header>",
+      "css": ".ds-masthead { display: grid; grid-template-columns: 200px 1fr; grid-template-rows: 44px 44px 44px; gap: 1px; background: rgba(255, 253, 219, 0.14); border-bottom: 1px solid rgba(255, 253, 219, 0.14); } .ds-cell { position: relative; display: flex; align-items: center; justify-content: center; margin: 0; background: #181616; color: #FFFDDB; } .ds-group { display: flex; gap: 1px; background: rgba(255, 253, 219, 0.14); } .ds-group .ds-cell { flex: 1; } .ds-link { padding: 0 12px; border: 0; font: 500 13px 'Roboto Mono', ui-monospace, monospace; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: color 200ms ease; } .ds-link:hover { color: var(--hl); } .ds-link[aria-pressed='true'] { color: #FF3831; } .ds-link:focus-visible { outline: 2px solid #FF3831; outline-offset: -2px; } .ds-tagline { grid-column: 2; grid-row: 2; padding: 0 20px; font: 400 28px/1 'Instrument Serif', Georgia, serif; } .ds-tagline span { background: linear-gradient(90deg, var(--hl) 0 50%, #FFFDDB 50% 100%) 100% 0 / 200% 100% no-repeat; -webkit-background-clip: text; background-clip: text; color: transparent; transition: background-position 700ms cubic-bezier(0.77, 0, 0.175, 1); } .ds-tagline::before, .ds-tagline::after { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: var(--hl); transform: scaleX(0); transform-origin: left; transition: transform 700ms cubic-bezier(0.77, 0, 0.175, 1); } .ds-tagline::before { top: -1px; } .ds-tagline::after { bottom: -1px; } .ds-masthead:hover .ds-tagline span { background-position: 0 0; } .ds-masthead:hover .ds-tagline::before, .ds-masthead:hover .ds-tagline::after { transform: scaleX(1); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Square dark well with a stacked label; border turns red on focus.",
+      "html": "<label class=\"ds-field\">Nome<input class=\"ds-input\" name=\"nome\" /></label>",
+      "css": ".ds-field { display: grid; gap: 8px; color: #FFFDDB; font: 700 13px 'Manrope Variable', system-ui, sans-serif; } .ds-input { width: 100%; padding: 12px 14px; border: 1px solid rgba(255, 253, 219, 0.3); border-radius: 0; background: #110F0F; color: #FFFDDB; font: 500 16px 'Manrope Variable', system-ui, sans-serif; transition: border-color 160ms ease; } .ds-input:focus, .ds-input:focus-visible { border-color: #FF3831; outline: none; }"
+    },
+    {
+      "name": "Coordinate Readout",
+      "kind": "chip",
+      "refersTo": "readout-chip",
+      "description": "Mono measurement plate over the grid.",
+      "html": "<p class=\"ds-coord\">X 1.61</p>",
+      "css": ".ds-coord { display: inline-block; margin: 0; padding: 4px 8px; background: rgba(24, 22, 22, 0.9); border: 1px solid rgba(255, 253, 219, 0.14); color: #B8B49C; font: 400 12px 'Roboto Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Ticker Pill",
+      "kind": "custom",
+      "refersTo": "ticker-pill",
+      "description": "Looping uppercase mono ticker with red square separators.",
+      "html": "<div class=\"ds-ticker\"><div class=\"ds-ticker-track\"><span>Arraste para explorar o trabalho</span><span>Apps, plataformas e sistemas sob medida</span><span>Arraste para explorar o trabalho</span><span>Apps, plataformas e sistemas sob medida</span></div></div>",
+      "css": ".ds-ticker { width: min(440px, calc(100% - 32px)); overflow: hidden; border: 1px solid rgba(255, 253, 219, 0.3); border-radius: 8px; background: rgba(17, 15, 15, 0.9); color: #FFFDDB; font: 500 12px 'Roboto Mono', ui-monospace, monospace; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); } .ds-ticker-track { display: flex; width: max-content; animation: ds-ticker 30s linear infinite; } .ds-ticker:hover .ds-ticker-track { animation-play-state: paused; } .ds-ticker span { padding: 12px 0; } .ds-ticker span::after { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 18px; vertical-align: middle; background: #FF3831; } @keyframes ds-ticker { to { transform: translateX(-50%); } } @media (prefers-reduced-motion: reduce) { .ds-ticker-track { animation: none; } }"
+    },
+    {
+      "name": "Drawer",
+      "kind": "card",
+      "refersTo": "drawer",
+      "description": "Square side panel with a sticky close bar, serif title, red mono section label, and ruled lists.",
+      "html": "<aside class=\"ds-drawer\"><div class=\"ds-drawer-bar\"><button class=\"ds-close\">Fechar<span class=\"ds-x\" aria-hidden=\"true\"></span></button></div><div class=\"ds-drawer-body\"><h2>Somos a NEXUS LABS</h2><p class=\"ds-lead\">Somos um estúdio de produtos digitais.</p><h3>O que construímos</h3><ul class=\"ds-list\"><li>Aplicativos mobile</li><li>Plataformas web</li><li>Sistemas sob medida</li></ul></div></aside>",
+      "css": ".ds-drawer { width: min(440px, 100%); background: #181616; color: #FFFDDB; border-left: 1px solid rgba(255, 253, 219, 0.14); font-family: 'Manrope Variable', system-ui, sans-serif; } .ds-drawer-bar { display: flex; justify-content: flex-end; border-bottom: 1px solid rgba(255, 253, 219, 0.14); } .ds-close { display: flex; gap: 10px; align-items: center; min-height: 44px; padding: 0 18px; border: 0; border-left: 1px solid rgba(255, 253, 219, 0.14); background: transparent; color: #FFFDDB; font: 700 12px 'Manrope Variable', system-ui, sans-serif; cursor: pointer; } .ds-close:focus-visible { outline: 2px solid #FF3831; outline-offset: -2px; } .ds-x { position: relative; width: 12px; height: 12px; } .ds-x::before, .ds-x::after { content: ''; position: absolute; top: 5px; left: -1px; width: 14px; height: 1.5px; background: currentColor; transform: rotate(45deg); } .ds-x::after { transform: rotate(-45deg); } .ds-drawer-body { padding: 32px 28px 56px; } .ds-drawer h2 { margin: 0 0 22px; font: 400 48px/0.98 'Instrument Serif', Georgia, serif; letter-spacing: -0.01em; } .ds-lead { margin: 0 0 16px; font-size: 17px; line-height: 1.6; } .ds-drawer h3 { margin: 36px 0 12px; font: 500 12px 'Roboto Mono', ui-monospace, monospace; letter-spacing: 0.04em; text-transform: uppercase; color: #FF3831; } .ds-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255, 253, 219, 0.14); } .ds-list li { padding: 12px 0; border-bottom: 1px solid rgba(255, 253, 219, 0.14); font-size: 15px; }"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "refersTo": "red",
+      "description": "Cream link with a red underline.",
+      "html": "<a class=\"ds-text-link\" href=\"#\">ola@nexuslab.com.br</a>",
+      "css": ".ds-text-link { color: #FFFDDB; font: 400 15px 'Manrope Variable', system-ui, sans-serif; text-decoration: underline; text-decoration-color: #FF3831; text-underline-offset: 4px; } .ds-text-link:focus-visible { outline: 2px solid #FF3831; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Night Territory",
+    "overview": "The studio's work is one territory seen at night: a warm near-black ground ruled by a faint cream grid, with dozens of project clusters laid across it and bent through a barrel lens, as if viewed from above. The territory is never still: it drifts slowly and keeps the direction of the visitor's last drag. Where the pointer passes, the nearby rules glow red, and the cluster under it takes a red frame. The page is a map, not a brochure. The chrome is near-black, cream, and one red, so the project imagery carries the rest of the colour.\n\nStructure is boxed. The header is three rows of cells on 1px cream rules (the rule colour shows through a 1px grid gap), and every panel, list, and gallery uses the same device: flat dark fields divided by hairlines. Corners are square except the two marked exceptions, the header CTA and the ticker pill. Depth comes from tone and the lens, never from shadows.\n\nThe header is the one place colour plays. Each new hover zone takes the next colour in a fixed cycle (green, red, violet, cyan), and that colour sweeps through the masked logo or mark, fills the tagline type, and draws the tagline rules in from the side the hover came from. Everywhere else the interface keeps to red for action. Type has three voices: Instrument Serif for the human lines (taglines, drawer titles, the CTA), Manrope for interface and prose, Roboto Mono for labels and measurements (uppercase nav, drawer section labels, coordinates, the ticker).\n\nThis world replaces the earlier \"Keystone Night\" (Deep Slate, Luminous Cyan) by user direction on 2026-11-10. The Keystone colours remain inside the logo files only; on the site the logo renders as a cream mask.",
+    "keyCharacteristics": [
+      "Warm near-black ground with cream hairline rules; colour belongs to the work and to the header's hover sweep.",
+      "Red is the single action colour, used as a solid block or as a line.",
+      "Three-row boxed header on 1px rules; header hover cycles green, red, violet, cyan as hard-edged sweeps.",
+      "A drifting, lensed grid whose rules glow red near the pointer.",
+      "Serif for the human lines, sans for interface, uppercase mono for labels and readouts.",
+      "Flat surfaces; depth by tone, vignette, and lens."
+    ],
+    "rules": [
+      { "name": "The One Red Rule", "body": "Red is the only action colour. It appears as a solid block or as a line (focus, link underline, pressed label, frame, glow). The hover cycle colours never mark an action or a state that persists.", "section": "colors" },
+      { "name": "The Header Plays Rule", "body": "The four-colour cycle lives only in the masthead and only while hovered. Outside the header, colour at rest is cream, muted, and red.", "section": "colors" },
+      { "name": "The Hard Sweep Rule", "body": "Colour moves as a hard-edged two-colour field sliding through a shape (a 50/50 hard stop, 700ms on cubic-bezier(0.77, 0, 0.175, 1)), never as a soft blend. Soft decorative gradients do not exist in this system; the only other gradient is the ticker's edge-fade mask.", "section": "colors" },
+      { "name": "The Cream Mask Rule", "body": "The logo and mark render as CSS masks of the logo SVGs filled with cream (or the sweep colour). The coloured Keystone SVGs are not placed on the site.", "section": "colors" },
+      { "name": "The Three Voices Rule", "body": "Serif for statements (taglines, drawer titles, the header CTA), Manrope for interface controls and prose, Roboto Mono uppercase for labels and measurements. Mono never sets prose or drawer titles; the serif sets no control except the header CTA.", "section": "typography" },
+      { "name": "The Heavy Small Rule", "body": "Interface text in Manrope runs small and heavy (12 to 14px at 700 to 800) rather than large and light.", "section": "typography" },
+      { "name": "The No Lift Rule", "body": "Nothing floats on a shadow. Separate surfaces with a hairline or a tonal step.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do build structure from 1px cream rules (rgba(255, 253, 219, 0.14)) and flat Warm Night fields; use Rule Strong only for control borders.",
+      "Do keep Signal Red as the one action colour, as a solid block or as a line.",
+      "Do confine the green, red, violet, cyan hover cycle to the masthead, as hard-edged sweeps on cubic-bezier(0.77, 0, 0.175, 1) at about 700ms.",
+      "Do render the logo and mark as cream masks.",
+      "Do set statements in Instrument Serif, interface in Manrope at 12 to 14px heavy weights, and labels and measurements in uppercase Roboto Mono.",
+      "Do keep corners square; the header CTA (6px) and the ticker pill (8px) are the only rounded elements.",
+      "Do animate drawers on cubic-bezier(0.32, 0.72, 0, 1) and controls on cubic-bezier(0.23, 1, 0.32, 1) at about 160ms, and stop transitions, the ticker, and the grid drift under prefers-reduced-motion.",
+      "Do gate hover styles behind `(hover: hover) and (pointer: fine)`."
+    ],
+    "donts": [
+      "Don't add drop shadows or floating cards; separate with a hairline or a tonal step.",
+      "Don't use the hover-cycle colours outside the header or for a persistent state.",
+      "Don't use soft or decorative gradients; colour changes as a hard-edged sweep.",
+      "Don't place the coloured Keystone logo files or the retired Deep Slate grounds on the site, or bring cyan back as an action colour (it lives only in the hover cycle).",
+      "Don't set prose or drawer titles in Roboto Mono, or controls other than the header CTA in Instrument Serif.",
+      "Don't round drawer buttons, inputs, cells, or drawers."
+    ]
+  }
+}

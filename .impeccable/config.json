@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/styles.css"
+        ],
+        "createdAt": "2026-11-11T00:24:59.782Z",
+        "reason": "user requested (2026-11-10, reference video) the tagline colour-sweep: a hard-stop two-colour fill animated on hover, not a decorative gradient"
+      }
+    ]
+  }
+}
