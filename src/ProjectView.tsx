@@ -172,5 +172,7 @@ export default function ProjectView({ project, from, email, onClose, onAbout, on
     </div>
 
     <button className="pv-back" onClick={onClose} aria-label="Voltar para a grade de projetos"><span className="mark" aria-hidden="true" /></button>
+    {/* Phones: the pill has no room for the CTA, so it docks at the bottom once the masthead folds away. */}
+    <button className="pv-cta pv-cta-dock" inert={!compact} onClick={() => onStart(current)}>Começar um projeto</button>
   </section>
 }

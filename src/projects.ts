@@ -7,6 +7,9 @@
 // A imagem 6 pode ter um vídeo (`video`): ele toca no lugar dela na galeria e, em versão leve
 // (`videoSmall`, ex.: 480x320), na grade. A imagem 6 continua sendo o quadro de espera do vídeo.
 //
+// Depois de trocar ou adicionar imagens, rode `npm run thumbs`: ele gera as miniaturas leves que a
+// grade da página inicial usa (public/projects/grid/). Sem elas a grade baixa as imagens grandes.
+//
 // `illustrative: true` marca o projeto como exemplo ilustrativo em todos os lugares onde aparece.
 // Os exemplos atuais são produtos fictícios; as telas foram desenhadas para o site e as fotos vêm
 // do Unsplash, sob a Licença Unsplash (uso comercial gratuito, sem atribuição obrigatória).

@@ -759,6 +759,11 @@ button {
   }
 }
 
+/* Wrapper that lets App make the project view inert under a drawer; it adds no box. */
+.view-layer {
+  display: contents;
+}
+
 .app[data-mode='project'] .masthead {
   position: fixed;
   top: 0;
@@ -1188,6 +1193,10 @@ button {
   transform: scale(0.95);
 }
 
+.pv-cta-dock {
+  display: none;
+}
+
 @media (hover: none), (max-width: 760px) {
   .pv-intro {
     position: static;
@@ -1216,10 +1225,35 @@ button {
   .pv-corner {
     display: none;
   }
+  /* 56px pill: the logo and picker inside it become 46px touch targets. */
   .pv-pill {
     top: 10px;
     width: calc(100% - 20px);
-    height: 50px;
+    height: 56px;
+    padding: 4px;
+  }
+  .pv-option {
+    min-height: 44px;
+  }
+  .pv-pill .pv-cta {
+    display: none;
+  }
+  .pv-cta-dock {
+    position: fixed;
+    left: 96px;
+    right: 16px;
+    bottom: 20px;
+    z-index: 4;
+    display: block;
+    height: 64px;
+    margin: 0;
+    border-radius: 12px;
+    transition: opacity 320ms ease, transform 520ms var(--ease-drawer);
+  }
+  .project-view:not([data-compact='true']) .pv-cta-dock {
+    opacity: 0;
+    transform: translateY(calc(100% + 24px));
+    pointer-events: none;
   }
   .pv-logo .logo-mask {
     width: 84px;
@@ -1236,9 +1270,6 @@ button {
   .pv-menu {
     left: -96px;
     width: calc(100vw - 20px);
-  }
-  .pv-cta {
-    display: none;
   }
   .pv-gallery {
     gap: 10px;
