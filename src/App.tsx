@@ -15,7 +15,8 @@ const socials = [
 ].filter(([, href]) => href)
 
 const interests = ['Aplicativo mobile', 'Plataforma web', 'Sistema sob medida', 'Ainda não sei']
-const tickerItems = ['Arraste para explorar o trabalho', 'Apps, plataformas e sistemas sob medida', 'Para startups e empresas', 'Clique em um projeto para abrir']
+const touch = typeof matchMedia === 'function' && matchMedia('(hover: none)').matches
+const tickerItems = ['Arraste para explorar o trabalho', 'Apps, plataformas e sistemas sob medida', 'Para startups e empresas', touch ? 'Toque em um projeto para abrir' : 'Clique em um projeto para abrir']
 
 type Panel = { type: 'about' } | { type: 'list' } | { type: 'contact' } | null
 
@@ -24,7 +25,9 @@ const Mark = () => <span className="mark" aria-hidden="true" />
 function Drawer({ side, title, onClose, children }: { side: 'left' | 'right'; title: string; onClose: () => void; children: ReactNode }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => { heading.current?.focus() }, [title])
-  return <aside className={`drawer drawer-${side}`} aria-labelledby="drawer-title">
+  // A dialog over the page; the masthead stays usable (it toggles the drawers), everything
+  // behind the drawer is made inert by App while it is open.
+  return <aside className={`drawer drawer-${side}`} role="dialog" aria-labelledby="drawer-title">
     <div className="drawer-bar">
       <button className="drawer-close" onClick={onClose}>Fechar<span aria-hidden="true" className="close-icon" /></button>
     </div>
@@ -77,16 +80,22 @@ export default function App() {
     opener.current = document.activeElement as HTMLElement
     setPanel(next)
   }, [])
-  const close = useCallback(() => {
-    setPanel(null)
-    opener.current?.focus?.()
-  }, [])
+  const close = useCallback(() => setPanel(null), [])
+  // Focus goes back after the render that lifts `inert` from the page, or it would be refused.
+  useEffect(() => {
+    if (panel || !opener.current) return
+    opener.current.focus?.()
+    opener.current = null
+  }, [panel])
   // An open project fills the screen; Sobre and Contato drawers can still open over it.
   const [viewing, setViewing] = useState<{ project: Project; from?: TileRect[] } | null>(null)
   const [compact, setCompact] = useState(false)
   const viewOpener = useRef<HTMLElement | null>(null)
   const openProject = useCallback((project: Project, from?: TileRect[]) => {
-    viewOpener.current = document.activeElement as HTMLElement
+    // Opened from a drawer: the project view takes focus, and closing it returns to the button
+    // that opened the drawer (the drawer itself is gone by then).
+    viewOpener.current = opener.current ?? document.activeElement as HTMLElement
+    opener.current = null
     setPanel(null)
     setViewing({ project, from })
   }, [])
@@ -139,7 +148,7 @@ export default function App() {
       </div>
     </header>
 
-    <main id="conteudo" className="stage">
+    <main id="conteudo" className="stage" inert={!!panel}>
       <ProjectGrid onOpen={openProject} onReady={onReady} paused={!!viewing} />
       <div className="ticker" aria-label="Avisos">
         <div className="ticker-viewport"><div className="ticker-track">{[0, 1].map(copy => <p key={copy} aria-hidden={copy === 1 || undefined}>{tickerItems.map(item => <span key={item}>{item}</span>)}</p>)}</div></div>
@@ -169,8 +178,10 @@ export default function App() {
       </li>)}</ul>
     </Drawer>}
 
-    {viewing && <ProjectView key={viewing.project.slug} project={viewing.project} from={viewing.from} email={email}
-      onClose={closeView} onAbout={() => open({ type: 'about' })} onStart={p => startProject(p.kind)} onCompact={setCompact} />}
+    {viewing && <div className="view-layer" inert={!!panel}>
+      <ProjectView key={viewing.project.slug} project={viewing.project} from={viewing.from} email={email}
+        onClose={closeView} onAbout={() => open({ type: 'about' })} onStart={p => startProject(p.kind)} onCompact={setCompact} />
+    </div>}
 
     {panel?.type === 'contact' && <Drawer side="right" title="Começar um projeto" onClose={close}>
       <p className="lead">Conte o que você quer construir. A gente responde por e-mail.</p>

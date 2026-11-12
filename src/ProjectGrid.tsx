@@ -196,7 +196,13 @@ function tileRects(hit: Hit, w: number, h: number, offset: { x: number; y: numbe
   })
 }
 
-function loadAtlas(size: number): Promise<HTMLCanvasElement> {
+// The grid draws every image small, so it reads the thumbnails in public/projects/grid/
+// (made by `npm run thumbs`) and falls back to the full image when a thumbnail is missing.
+const thumbOf = (src: string) => src.replace(/^\/projects\//, '/projects/grid/')
+
+// Draws each image into the atlas as it arrives and reports progress, so the grid can show
+// the work before the last image has loaded.
+function loadAtlas(size: number, onProgress: (canvas: HTMLCanvasElement, loaded: number, total: number) => void): Promise<HTMLCanvasElement> {
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
@@ -206,6 +212,12 @@ function loadAtlas(size: number): Promise<HTMLCanvasElement> {
   const slotW = size / ATLAS_COLS
   const slotH = size / ATLAS_ROWS
   const sources = projects.flatMap(p => p.images.slice(0, 6))
+  let loaded = 0
+  const done = (resolve: () => void) => {
+    loaded++
+    onProgress(canvas, loaded, sources.length)
+    resolve()
+  }
   return Promise.all(sources.map((src, i) => new Promise<void>(resolve => {
     const img = new Image()
     img.onload = () => {
@@ -229,10 +241,13 @@ function loadAtlas(size: number): Promise<HTMLCanvasElement> {
       ctx.clip()
       ctx.drawImage(img, x + gx + (iw - dw) / 2, y + gy + (ih - dh) / 2, dw, dh)
       ctx.restore()
-      resolve()
+      done(resolve)
     }
-    img.onerror = () => resolve()
-    img.src = src
+    img.onerror = () => {
+      if (img.src.includes('/projects/grid/')) img.src = src
+      else done(resolve)
+    }
+    img.src = thumbOf(src)
   }))).then(() => canvas)
 }
 
@@ -269,6 +284,10 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       return
     }
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+    const phone = matchMedia('(max-width: 760px), (hover: none)').matches
+    const saveData = !!(navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
+    // Touch screens have no hover, so the grid names the project at its centre instead.
+    const touch = matchMedia('(hover: none)').matches
 
     const compile = (type: number, src: string) => {
       const s = gl.createShader(type)!
@@ -350,15 +369,31 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       return null
     }
 
-    // The label only names the keyboard's target; pointer hover is shown by the rules alone.
+    // The cluster whose middle is closest to the centre of the screen, even when the centre
+    // falls in the gap between clusters, so the touch label never blinks off while drifting.
+    const nearestHit = (): Hit => {
+      const { wx, wy } = toWorld(w / 2, h / 2, w, h, offset, zoom)
+      const cx = Math.round((wx / CELL_W - 2) / PERIOD_X)
+      const cy = Math.round((wy / CELL_H - 1) / PERIOD_Y)
+      const n = projects.length
+      return { cx, cy, project: projects[(((cx + cy * 5) % n) + n) % n] }
+    }
+
+    // The label names the keyboard's target, or on touch screens the project at the centre;
+    // mouse hover is shown by the rules alone.
     const showLabel = (next: Hit | null, x: number, y: number) => {
       const el = label.current
       if (!el) return
-      el.dataset.show = next && !dragging && keyboard ? 'true' : 'false'
+      el.dataset.show = next && !dragging && (keyboard || touch) ? 'true' : 'false'
       if (!next) return
-      el.style.transform = `translate(${Math.min(x + 18, w - 260)}px, ${y + 18}px)`
       el.querySelector('strong')!.textContent = next.project.name
       el.querySelector('span')!.textContent = `${next.project.kind}${next.project.illustrative ? ' · exemplo ilustrativo' : ''}`
+      // On touch it sits centred just above the ticker, in reach of the thumb and off the work.
+      if (touch && !keyboard) {
+        const ticker = canvas.closest('.stage')?.querySelector<HTMLElement>('.ticker')
+        const top = ticker ? ticker.offsetTop - el.offsetHeight - 10 : h - el.offsetHeight - 96
+        el.style.transform = `translate(${Math.round((w - el.offsetWidth) / 2)}px, ${Math.round(top)}px)`
+      } else el.style.transform = `translate(${Math.min(x + 18, w - 260)}px, ${y + 18}px)`
     }
 
     const setHover = (next: Hit | null, x = 0, y = 0) => {
@@ -379,6 +414,7 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       // The keyboard target is named at the top of the stage, clear of the clusters.
       if (keyboard) return setHover(centreHit(), w / 2 - 158, 0)
       if (pointer.inside) return setHover(pick(pointer.x, pointer.y, w, h, offset, zoom), pointer.x, pointer.y)
+      if (touch) return setHover(nearestHit())
       return false
     }
 
@@ -426,7 +462,7 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       gl.uniform1f(uZoom, zoom)
       gl.uniform1f(uReveal, reveal)
       gl.uniform2f(uHover, hover?.cx ?? 0, hover?.cy ?? 0)
-      gl.uniform1f(uFrame, hover && keyboard ? 1 : 0)
+      gl.uniform1f(uFrame, hover && (keyboard || (touch && !dragging)) ? 1 : 0)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
       if (coordX.current) coordX.current.textContent = (offset.x / CELL_W).toFixed(6)
       if (coordY.current) coordY.current.textContent = (-offset.y / CELL_H).toFixed(6)
@@ -503,12 +539,12 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       if (e.pointerType === 'mouse') {
         Object.assign(pointer, p, { inside: true })
         setHover(pick(p.x, p.y, w, h, offset, zoom), p.x, p.y)
-      }
+      } else refreshHover()
       request()
     }
     const leave = () => {
       pointer.inside = false
-      if (!dragging && !keyboard) setHover(null)
+      if (!dragging && !keyboard && !touch) setHover(null)
       request()
     }
     const wheel = (e: WheelEvent) => {
@@ -563,9 +599,10 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
     observer.observe(canvas)
     resize()
 
-    // Sharper tiles on dense screens when the GPU allows a 4096 atlas.
+    // Sharper tiles on dense screens when the GPU allows a 4096 atlas. Phones keep 2048: the
+    // tiles are small there and a 4096 texture costs 64 MB of GPU memory.
     const maxTexture = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number
-    const atlasSize = maxTexture >= 4096 && (window.devicePixelRatio || 1) >= 1.5 ? 4096 : 2048
+    const atlasSize = !phone && maxTexture >= 4096 && (window.devicePixelRatio || 1) >= 1.5 ? 4096 : 2048
 
     // Moving tiles: small looping videos uploaded into their slots as frames arrive.
     // Under reduced motion they never start and the poster stays in the main atlas.
@@ -621,20 +658,35 @@ export default function ProjectGrid({ onOpen, onReady, paused = false }: Props) 
       gl.activeTexture(gl.TEXTURE0)
     }
     setVideosPlaying = (on: boolean) => videos.forEach(v => { if (on) v.el.play().catch(() => {}); else v.el.pause() })
-    if (!reduce) startVideos()
+    // Phones and data-saver connections keep the still posters: twelve looping videos are
+    // several megabytes and a steady decode load for a grid seen at thumbnail size.
+    if (!reduce && !phone && !saveData) startVideos()
 
     let alive = true
-    loadAtlas(atlasSize).then(atlas => {
-      if (!alive) return
+    let shown = false
+    let lastUpload = 0
+    const upload = (atlas: HTMLCanvasElement) => {
       gl.bindTexture(gl.TEXTURE_2D, texture)
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas)
       gl.generateMipmap(gl.TEXTURE_2D)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-      start = performance.now()
-      onReady?.()
+      lastUpload = performance.now()
+      if (!shown) {
+        shown = true
+        start = performance.now()
+        onReady?.()
+      }
+      refreshHover()
       request()
-    })
+    }
+    // The grid appears once a first share of the images is in, then fills in as the rest
+    // arrive (uploads are spaced out so a slow connection does not re-upload on every image).
+    loadAtlas(atlasSize, (atlas, loaded, total) => {
+      if (!alive || loaded === total) return
+      const now = performance.now()
+      if (shown ? now - lastUpload > 400 : loaded >= Math.ceil(total / 3)) upload(atlas)
+    }).then(atlas => { if (alive) upload(atlas) })
 
     return () => {
       alive = false
