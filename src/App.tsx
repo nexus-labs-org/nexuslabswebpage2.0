@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
+import PaintWord from './PaintWord'
 import ProjectGrid from './ProjectGrid'
+import ProjectView, { type TileRect } from './ProjectView'
 import { projects, type Project } from './projects'
 
 const email = 'ola@nexuslab.com.br'
@@ -12,13 +14,10 @@ const socials = [
   ['Instagram', ''],
 ].filter(([, href]) => href)
 
-// Colours the header cycles through on hover: green, red, violet, cyan.
-const hoverColors = ['#3FBF6B', '#FF3831', '#7A5CFF', '#00E5FF']
-
 const interests = ['Aplicativo mobile', 'Plataforma web', 'Sistema sob medida', 'Ainda não sei']
 const tickerItems = ['Arraste para explorar o trabalho', 'Apps, plataformas e sistemas sob medida', 'Para startups e empresas', 'Clique em um projeto para abrir']
 
-type Panel = { type: 'about' } | { type: 'list' } | { type: 'contact' } | { type: 'project'; project: Project } | null
+type Panel = { type: 'about' } | { type: 'list' } | { type: 'contact' } | null
 
 const Mark = () => <span className="mark" aria-hidden="true" />
 
@@ -82,62 +81,68 @@ export default function App() {
     setPanel(null)
     opener.current?.focus?.()
   }, [])
-  const openProject = useCallback((project: Project) => open({ type: 'project', project }), [open])
+  // An open project fills the screen; Sobre and Contato drawers can still open over it.
+  const [viewing, setViewing] = useState<{ project: Project; from?: TileRect[] } | null>(null)
+  const [compact, setCompact] = useState(false)
+  const viewOpener = useRef<HTMLElement | null>(null)
+  const openProject = useCallback((project: Project, from?: TileRect[]) => {
+    viewOpener.current = document.activeElement as HTMLElement
+    setPanel(null)
+    setViewing({ project, from })
+  }, [])
+  const closeView = useCallback(() => {
+    setViewing(null)
+    viewOpener.current?.focus?.()
+  }, [])
   const onReady = useCallback(() => setReady(true), [])
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (panel) close()
+      else if (viewing) closeView()
+    }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [close])
+  }, [close, closeView, panel, viewing])
 
-  // Header hover: the zone decides which rules and tagline light up; each new hover takes the next colour.
-  const [zone, setZone] = useState('')
-  const [colorIndex, setColorIndex] = useState(0)
-  const lightUp = (next: string) => {
-    if (next === zone) return
-    setColorIndex(i => (i + 1) % hoverColors.length)
-    setZone(next)
-  }
-
-  const interest = panel?.type === 'project' ? panel.project.kind : interests[0]
   const [contactInterest, setContactInterest] = useState(interests[0])
   const startProject = (from?: string) => {
     setContactInterest(from && interests.includes(from) ? from : interests[0])
     open({ type: 'contact' })
   }
 
-  return <div className="app" data-ready={ready}>
+  return <div className="app" data-ready={ready} data-mode={viewing ? 'project' : 'grid'} data-compact={compact}>
     <a className="skip" href="#conteudo">Pular para o conteúdo</a>
-    <header className="masthead" data-zone={zone} style={{ '--hl': hoverColors[colorIndex] } as CSSProperties} onPointerLeave={() => setZone('')}>
-      <nav className="cell-group cell-group-left" aria-label="Seções" onPointerEnter={() => lightUp('left')}>
+    <header className="masthead">
+      <nav className="cell-group cell-group-left" aria-label="Seções">
         <button className="cell cell-link" aria-pressed={panel?.type === 'about'} onClick={() => panel?.type === 'about' ? close() : open({ type: 'about' })}>Sobre</button>
         <button className="cell cell-link" aria-pressed={panel?.type === 'list'} onClick={() => panel?.type === 'list' ? close() : open({ type: 'list' })}>Projetos</button>
       </nav>
-      <div className="cell cell-mark" onPointerEnter={() => lightUp('left')}><Mark /></div>
+      <div className="cell cell-mark"><Mark /></div>
       <div className="cell cell-blank cell-blank-l1" aria-hidden="true" />
-      <p className="cell cell-tagline cell-tagline-left"><span>Apps, plataformas e sistemas</span></p>
+      <p className="cell cell-tagline cell-tagline-left"><PaintWord>Apps, plataformas e sistemas</PaintWord></p>
       <div className="cell cell-blank cell-blank-l3" aria-hidden="true" />
-      <h1 className="cell cell-logo" onPointerEnter={() => lightUp('logo')}>
-        <span className="logo-mask" aria-hidden="true" />
+      <h1 className="cell cell-logo">
+        <PaintWord logo />
         <span className="sr-only">NEXUS LABS — estúdio de produtos digitais</span>
       </h1>
       <div className="cell cell-blank cell-blank-r1" aria-hidden="true" />
-      <p className="cell cell-tagline cell-tagline-right"><span>Do insight ao produto no ar</span></p>
+      <p className="cell cell-tagline cell-tagline-right"><PaintWord>Do insight ao produto no ar</PaintWord></p>
       <div className="cell cell-blank cell-blank-r3" aria-hidden="true" />
-      <nav className="cell-group cell-group-right" aria-label="Contato" onPointerEnter={() => lightUp('right')}>
+      <nav className="cell-group cell-group-right" aria-label="Contato">
         {socials.map(([label, href]) => <a key={label} className="cell cell-link" href={href} target="_blank" rel="noopener noreferrer">{label}</a>)}
         <a className="cell cell-link" href={`mailto:${email}`}>E-mail</a>
       </nav>
-      <div className="cell cell-cta-wrap" onPointerEnter={() => lightUp('right')}>
+      <div className="cell cell-cta-wrap">
         <button className="cell-cta" onClick={() => startProject()}><span>Começar um projeto</span></button>
       </div>
     </header>
 
     <main id="conteudo" className="stage">
-      <ProjectGrid onOpen={openProject} onReady={onReady} />
+      <ProjectGrid onOpen={openProject} onReady={onReady} paused={!!viewing} />
       <div className="ticker" aria-label="Avisos">
-        <div className="ticker-track">{[0, 1].map(copy => <p key={copy} aria-hidden={copy === 1 || undefined}>{tickerItems.map(item => <span key={item}>{item}</span>)}</p>)}</div>
+        <div className="ticker-viewport"><div className="ticker-track">{[0, 1].map(copy => <p key={copy} aria-hidden={copy === 1 || undefined}>{tickerItems.map(item => <span key={item}>{item}</span>)}</p>)}</div></div>
       </div>
     </main>
 
@@ -157,20 +162,15 @@ export default function App() {
 
     {panel?.type === 'list' && <Drawer side="left" title="Projetos" onClose={close}>
       <ul className="project-list">{projects.map(p => <li key={p.slug}>
-        <button onClick={() => setPanel({ type: 'project', project: p })}>
+        <button onClick={() => openProject(p)}>
           <img src={p.images[0]} alt="" width="96" height="64" loading="lazy" />
           <span><strong>{p.name}</strong><small>{p.kind}{p.illustrative && ' · exemplo ilustrativo'}</small></span>
         </button>
       </li>)}</ul>
     </Drawer>}
 
-    {panel?.type === 'project' && <Drawer side="right" title={panel.project.name} onClose={close}>
-      <p className="project-kind">{panel.project.kind}{panel.project.illustrative && ' · exemplo ilustrativo'}</p>
-      <p className="lead">{panel.project.summary}</p>
-      <div className="project-gallery">{panel.project.images.map((src, i) => <img key={src} src={src} alt={`${panel.project.name}, tela ${i + 1}`} loading="lazy" width="600" height="400" />)}</div>
-      {panel.project.illustrative && <p className="form-note">Projeto e imagens ilustrativos, para mostrar o tipo de trabalho do estúdio.</p>}
-      <button className="action" onClick={() => startProject(interest)}>Quero algo assim</button>
-    </Drawer>}
+    {viewing && <ProjectView key={viewing.project.slug} project={viewing.project} from={viewing.from} email={email}
+      onClose={closeView} onAbout={() => open({ type: 'about' })} onStart={p => startProject(p.kind)} onCompact={setCompact} />}
 
     {panel?.type === 'contact' && <Drawer side="right" title="Começar um projeto" onClose={close}>
       <p className="lead">Conte o que você quer construir. A gente responde por e-mail.</p>

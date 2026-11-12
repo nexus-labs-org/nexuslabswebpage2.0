@@ -46,7 +46,7 @@ Confirmed core delivery: digital products (apps, web platforms, custom systems).
 ## Evidence on Hand
 
 - No public case studies, client names, testimonials, or metrics yet. Do not fabricate them. The previous "+30 projetos lançados" figure is unconfirmed and must not be shown.
-- Project imagery is placeholder until real work is supplied.
+- Project imagery is placeholder until real work is supplied: 12 fictional products with screens and device mockups drawn for the site, looping demo videos (`*-6.webm`, small copies `*-6-sm.webm` for the grid), and context photos from Unsplash under the Unsplash License (free commercial use, attribution not required) in `public/projects/photos/`. Every project is labelled "exemplo ilustrativo"; never present them as client work.
 
 ## Product Principles
 

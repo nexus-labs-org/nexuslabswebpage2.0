@@ -5,6 +5,7 @@
   --cream: #FFFDDB;
   --muted: #B8B49C;
   --red: #FF3831;
+  --violet: #8B35FF;
   --rule: rgba(255, 253, 219, 0.14);
   --rule-strong: rgba(255, 253, 219, 0.3);
   --hl: var(--red);
@@ -156,15 +157,14 @@ button {
   grid-row: 2 / 4;
 }
 
-/* Logo, mark and taglines fill completely with the hover colour, swept in from the side the
-   hover came from, and the rules above and below draw in alongside. */
+/* Mark and logo are cream masks of the logo files, so their colour can change like text. */
 .mark,
 .logo-mask {
   display: block;
-  background: linear-gradient(90deg, var(--hl) 0 50%, var(--cream) 50% 100%) 100% 0 / 200% 100% no-repeat;
+  background-color: var(--cream);
   mask: var(--src) center / contain no-repeat;
   -webkit-mask: var(--src) center / contain no-repeat;
-  transition: background-position 700ms var(--ease-in-out);
+  transition: background-color 400ms ease;
 }
 
 .mark {
@@ -177,11 +177,6 @@ button {
   --src: url('/assets/nexus-labs-horizontal-dark.svg');
   width: min(78%, 330px);
   aspect-ratio: 960 / 256;
-}
-
-.masthead[data-zone='logo'] .logo-mask,
-.masthead[data-zone='left'] .mark {
-  background-position: 0 0;
 }
 
 .cell-blank-l1 { grid-column: 2; grid-row: 1; }
@@ -204,66 +199,41 @@ button {
   grid-column: 4;
 }
 
-.cell-tagline span {
-  background: linear-gradient(90deg, var(--hl) 0 50%, var(--cream) 50% 100%) 100% 0 / 200% 100% no-repeat;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  transition: background-position 700ms var(--ease-in-out);
+/* Header words are painted by the pointer (PaintWord): a coloured copy of the word sits over
+   the cream one and shows only where the brush mask lets it. The cells and rules never change. */
+.paint-word {
+  position: relative;
+  display: inline-block;
 }
 
-.cell-tagline-left span {
-  background-image: linear-gradient(270deg, var(--hl) 0 50%, var(--cream) 50% 100%);
-  background-position: 0 0;
-}
-
-.cell-tagline::before,
-.cell-tagline::after {
-  content: '';
+.paint-layer {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--hl);
-  transform: scaleX(0);
-  transition: transform 700ms var(--ease-in-out);
+  inset: 0;
+  color: var(--paint, var(--violet));
+  pointer-events: none;
+  mask-image: linear-gradient(transparent, transparent);
+  -webkit-mask-image: linear-gradient(transparent, transparent);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
 }
 
-.cell-tagline::before {
-  top: -1px;
+/* The logo: the whole word is clipped to the logo's shape; inside it the cream logo and the
+   painted colour field stack like the two copies of a text word. */
+.paint-logo {
+  display: block;
+  width: min(78%, 330px);
+  aspect-ratio: 960 / 256;
+  mask: url('/assets/nexus-labs-horizontal-dark.svg') center / contain no-repeat;
+  -webkit-mask: url('/assets/nexus-labs-horizontal-dark.svg') center / contain no-repeat;
 }
 
-.cell-tagline::after {
-  bottom: -1px;
+.paint-logo .logo-mask {
+  width: 100%;
+  height: 100%;
 }
 
-.cell-tagline-left::before,
-.cell-tagline-left::after,
-.masthead[data-zone='right'] .cell-tagline-right::before,
-.masthead[data-zone='right'] .cell-tagline-right::after {
-  transform-origin: right;
-}
-
-.cell-tagline-right::before,
-.cell-tagline-right::after,
-.masthead[data-zone='left'] .cell-tagline-left::before,
-.masthead[data-zone='left'] .cell-tagline-left::after {
-  transform-origin: left;
-}
-
-.masthead:is([data-zone='left'], [data-zone='logo']) .cell-tagline-left span {
-  background-position: 100% 0;
-}
-
-.masthead:is([data-zone='right'], [data-zone='logo']) .cell-tagline-right span {
-  background-position: 0 0;
-}
-
-.masthead:is([data-zone='left'], [data-zone='logo']) .cell-tagline-left::before,
-.masthead:is([data-zone='left'], [data-zone='logo']) .cell-tagline-left::after,
-.masthead:is([data-zone='right'], [data-zone='logo']) .cell-tagline-right::before,
-.masthead:is([data-zone='right'], [data-zone='logo']) .cell-tagline-right::after {
-  transform: scaleX(1);
+.paint-logo .paint-layer {
+  background: var(--paint, var(--violet));
 }
 
 .cell-logo {
@@ -357,25 +327,23 @@ button {
   opacity: 1;
 }
 
+/* Readouts sit on the grid as plain, quiet numbers, like the reference. */
 .coord {
   position: absolute;
-  top: 16px;
+  top: clamp(40px, 7vh, 64px);
   margin: 0;
-  padding: 4px 8px;
-  background: rgba(24, 22, 22, 0.9);
-  border: 1px solid var(--rule);
-  font: 400 12px var(--mono);
-  color: var(--muted);
+  font: 400 13px var(--mono);
+  color: rgba(255, 253, 219, 0.32);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
 
 .coord-left {
-  left: 20px;
+  left: 32px;
 }
 
 .coord-right {
-  right: 20px;
+  right: 32px;
 }
 
 .grid-label {
@@ -452,18 +420,24 @@ button {
 .ticker {
   position: absolute;
   left: 50%;
-  bottom: 22px;
-  width: min(440px, calc(100% - 32px));
+  bottom: clamp(20px, 7vh, 56px);
+  width: min(540px, calc(100% - 32px));
+  padding: 0 14px;
   overflow: hidden;
   transform: translateX(-50%);
   border: 1px solid var(--rule-strong);
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(17, 15, 15, 0.9);
-  font: 500 12px var(--mono);
+  font: 500 13px var(--mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
-  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+/* The text fades at the pill's ends; the pill's own border stays crisp. */
+.ticker-viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
 .ticker-track {
@@ -482,7 +456,7 @@ button {
 }
 
 .ticker span {
-  padding: 12px 0;
+  padding: 15px 0;
 }
 
 .ticker span::after {
@@ -666,31 +640,9 @@ button {
 
 
 
-.drawer .project-kind {
-  font-size: 14px;
-  font-weight: 700;
-}
 
-.project-gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  margin: 24px 0 12px;
-  background: var(--rule);
-}
 
-.project-gallery img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-}
 
-.project-gallery img:first-child,
-.project-gallery img:last-child {
-  grid-column: 1 / -1;
-}
 
 .project-list {
   margin: 0;
@@ -791,6 +743,522 @@ button {
   font-size: 13px;
 }
 
+/* Project view: every project in one continuous scroll over the full screen. The full masthead
+   stays on top at first; scrolling folds it away and the compact pill takes over. */
+.project-view {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: var(--ground);
+  animation: pv-fade 420ms var(--ease-out) both;
+}
+
+@keyframes pv-fade {
+  from {
+    background-color: transparent;
+  }
+}
+
+.app[data-mode='project'] .masthead {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--head-h);
+  z-index: 26;
+  transition: transform 520ms var(--ease-drawer);
+}
+
+.app[data-mode='project'][data-compact='true'] .masthead {
+  transform: translateY(-101%);
+}
+
+.app[data-mode='project'] .stage {
+  visibility: hidden;
+}
+
+.app[data-mode='project'] .drawer {
+  top: var(--head-h);
+  z-index: 30;
+}
+
+.app[data-mode='project'][data-compact='true'] .drawer {
+  top: 0;
+}
+
+.pv-corner,
+.pv-pill {
+  transition: opacity 320ms ease, transform 520ms var(--ease-drawer);
+}
+
+.project-view:not([data-compact='true']) :is(.pv-corner, .pv-pill) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pv-corner {
+  position: fixed;
+  top: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.pv-corner-left {
+  left: 14px;
+}
+
+.pv-corner-right {
+  right: 14px;
+}
+
+.pv-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--cream);
+  font: 500 12px var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pv-link:hover {
+    color: var(--red);
+  }
+}
+
+.pv-pill {
+  --hl: var(--red);
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: stretch;
+  height: 52px;
+  padding: 6px;
+  transform: translateX(-50%);
+  border: 1px solid var(--rule-strong);
+  border-radius: 12px;
+  background: rgba(24, 22, 22, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.project-view:not([data-compact='true']) .pv-pill {
+  transform: translate(-50%, -150%);
+}
+
+.pv-logo {
+  display: flex;
+  align-items: center;
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  background: none;
+  cursor: pointer;
+}
+
+.pv-logo .logo-mask {
+  width: 116px;
+}
+
+.pv-back .mark {
+  width: 28px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pv-logo:hover .logo-mask,
+  .pv-back:hover .mark {
+    background-color: var(--violet);
+  }
+}
+
+.pv-picker {
+  position: relative;
+  border-right: 1px solid var(--rule);
+}
+
+.pv-picker-button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  min-width: 240px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pv-picker-button span:first-child {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pv-picker-button[aria-expanded='true'] {
+  color: var(--red);
+}
+
+.pv-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 200ms var(--ease-out);
+}
+
+.pv-picker-button[aria-expanded='true'] .pv-chevron {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.pv-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  width: 290px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 12px;
+  background: #1D1A1A;
+  scrollbar-color: var(--rule-strong) transparent;
+  transform-origin: top left;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+}
+
+.pv-group + .pv-group {
+  margin-top: 14px;
+}
+
+.pv-group-label {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font: 500 11px var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pv-option {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.pv-option[aria-current='true'],
+.pv-option:hover {
+  color: var(--red);
+}
+
+.pv-cta {
+  margin-left: 6px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--red);
+  color: var(--cream);
+  font: 400 20px / 1 var(--serif);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), background-color 160ms ease;
+}
+
+.pv-cta:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pv-cta:hover {
+    background: #FF5A4F;
+  }
+}
+
+.pv-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--head-h) + 20px) clamp(16px, 2.4vw, 40px) 40vh;
+  scrollbar-width: none;
+}
+
+.pv-scroll:focus {
+  outline: none;
+}
+
+.pv-project {
+  max-width: 1760px;
+  margin: 0 auto 72px;
+}
+
+/* Name and summary for screen readers and touch screens; mouse readers get the trailing card. */
+.pv-intro {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Two rows: wide, normal, normal / normal, normal, wide — the same tiles as in the grid. */
+.pv-gallery {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  gap: 18px;
+  cursor: pointer;
+}
+
+.pv-gallery :is(img, video) {
+  display: block;
+  width: 100%;
+  height: clamp(220px, calc((100dvh - var(--head-h) - 76px) / 2), 560px);
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--panel);
+  transform-origin: center;
+}
+
+.pv-gallery > :nth-child(1),
+.pv-gallery > :nth-child(6) { grid-column: span 10; }
+.pv-gallery > :nth-child(2),
+.pv-gallery > :nth-child(3),
+.pv-gallery > :nth-child(4),
+.pv-gallery > :nth-child(5) { grid-column: span 7; }
+
+/* Moving between projects: tiles rise in from below and dim away as they leave the top. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pv-project + .pv-project .pv-gallery > * {
+      animation: pv-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    .pv-gallery {
+      animation: pv-exit linear both;
+      animation-timeline: view();
+      animation-range: exit 10% exit 90%;
+    }
+    .pv-project + .pv-project .pv-gallery > :nth-child(2),
+    .pv-project + .pv-project .pv-gallery > :nth-child(5) { animation-range: entry 6% entry 76%; }
+    .pv-project + .pv-project .pv-gallery > :nth-child(3),
+    .pv-project + .pv-project .pv-gallery > :nth-child(6) { animation-range: entry 12% entry 82%; }
+  }
+}
+
+@keyframes pv-enter {
+  from {
+    opacity: 0;
+    transform: translateY(90px) scale(0.96);
+  }
+}
+
+@keyframes pv-exit {
+  to {
+    opacity: 0.12;
+    transform: translateY(-40px) scale(0.98);
+  }
+}
+
+/* Services pill, and the message card above it once a gallery is clicked; both trail the pointer. */
+.pv-follow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  width: min(440px, calc(100vw - 32px));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.pv-follow[data-show='true'] {
+  opacity: 1;
+}
+
+.pv-card {
+  width: 100%;
+  padding: 24px 28px 26px;
+  border: 1px solid rgba(255, 253, 219, 0.6);
+  border-radius: 16px;
+  background: rgba(44, 41, 41, 0.55);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  transform-origin: top left;
+  animation: pv-card-in 260ms var(--ease-out) both;
+}
+
+@keyframes pv-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+}
+
+.pv-card strong {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.pv-card p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.pv-services {
+  width: min(320px, 76%);
+  overflow: hidden;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  background: rgba(24, 22, 22, 0.8);
+  backdrop-filter: blur(12px);
+  font: 500 12px var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pv-services-track {
+  display: flex;
+  width: max-content;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  animation: ticker 12s linear infinite;
+}
+
+.pv-services-track > span {
+  display: flex;
+}
+
+.pv-services-track span span {
+  padding: 11px 0;
+}
+
+.pv-services-track span span::after {
+  content: '\00B7';
+  margin: 0 12px;
+}
+
+.pv-back {
+  --hl: var(--red);
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: rgba(24, 22, 22, 0.86);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.pv-back:active {
+  transform: scale(0.95);
+}
+
+@media (hover: none), (max-width: 760px) {
+  .pv-intro {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    max-width: 62ch;
+    margin: 0 0 16px;
+  }
+  .pv-intro h2 {
+    margin: 0 0 6px;
+    font: 400 32px / 1 var(--serif);
+  }
+  .pv-intro p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .pv-follow {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .pv-corner {
+    display: none;
+  }
+  .pv-pill {
+    top: 10px;
+    width: calc(100% - 20px);
+    height: 50px;
+  }
+  .pv-logo .logo-mask {
+    width: 84px;
+  }
+  .pv-picker {
+    flex: 1;
+    min-width: 0;
+    border-right: 0;
+  }
+  .pv-picker-button {
+    width: 100%;
+    min-width: 0;
+  }
+  .pv-menu {
+    left: -96px;
+    width: calc(100vw - 20px);
+  }
+  .pv-cta {
+    display: none;
+  }
+  .pv-gallery {
+    gap: 10px;
+  }
+  .pv-gallery > *,
+  .pv-gallery > :nth-child(n) {
+    grid-column: 1 / -1;
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-view,
+  .pv-card,
+  .pv-services-track {
+    animation: none;
+  }
+}
+
 /* Tablet: taglines need more room than these widths give them */
 @media (max-width: 1100px) {
   .cell-tagline,
@@ -845,9 +1313,7 @@ button {
   .drawer-body {
     padding: 24px 20px 48px;
   }
-  .project-gallery {
-    grid-template-columns: 1fr;
-  }
+
 
 }
 
